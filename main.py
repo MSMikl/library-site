@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from urllib.parse import urljoin, urlparse
 
 import requests
 
@@ -17,31 +18,38 @@ def get_book_meta(id):
     url = f'https://tululu.org/b{id}/'
     response = requests.get(url)
     response.raise_for_status()
+    check_for_redirect(response)
     soup = BeautifulSoup(response.text, 'lxml')
     title = sanitize_filename(soup.find('h1').text.split('::')[0].strip())
     author = sanitize_filename(soup.find('h1').find('a').text)
-    return {'author': author, 'title': title}
+    image_url = urljoin('https://tululu.org/', soup.find(class_='bookimage').find('img')['src'])
+    return {'author': author, 'title': title, 'image_url': image_url}
 
 
-def download_txt(book_id, filename, folder='books/'):
-    url = f'https://tululu.org/txt.php?id={book_id}'
+def download_content(url, filename, folder):
     response = requests.get(url)
     response.raise_for_status()
-    try:
-        check_for_redirect(response)
-    except requests.HTTPError:
-        return
-    book_meta = get_book_meta(book_id)
-    filename = f"{book_id}. {sanitize_filename(book_meta['title'])}.txt"
     Path(folder).mkdir(parents=True, exist_ok=True)
     with open(os.path.join(folder, filename), 'wb') as file:
         file.write(response.content)
-    return True
 
 
 def main():
-    for book in range(1, 11):        
-        download_txt(book, 'books/')
+    Path('books/').mkdir(parents=True, exist_ok=True)
+    for book in range(1, 11):
+        url = f'https://tululu.org/txt.php?id={book}'
+        response = requests.get(url)
+        try:
+            check_for_redirect(response)
+        except requests.HTTPError:
+            continue
+        book_meta = get_book_meta(book)
+        filename = f"{book}. {sanitize_filename(book_meta['title'])}.txt"
+        with open(os.path.join('books/', filename), 'wb') as file:
+            file.write(response.content)
+        image_name = urlparse(book_meta['image_url']).path.split('/')[-1]
+        if image_name != 'nopic.gif':
+            download_content(book_meta['image_url'], image_name, 'images/')
 
 if __name__ == '__main__':
     main()

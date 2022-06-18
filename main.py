@@ -29,14 +29,14 @@ def get_book_meta(id):
     comments = [
         x.find('span', class_='black').text for x in soup.find_all('div', class_='texts')
     ]
-    genre = soup.find('span', class_='d_book').find('a').text
-    print(genre)
+    genres = [x.text for x in soup.find('span', class_='d_book').find_all('a')]
+    print(title, '\n', genres)
     return {
         'author': author,
         'title': title,
         'image_url': image_url,
         'comments': comments,
-        'genre': genre
+        'genres': genres
     }
 
 

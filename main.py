@@ -22,8 +22,20 @@ def get_book_meta(id):
     soup = BeautifulSoup(response.text, 'lxml')
     title = sanitize_filename(soup.find('h1').text.split('::')[0].strip())
     author = sanitize_filename(soup.find('h1').find('a').text)
-    image_url = urljoin('https://tululu.org/', soup.find(class_='bookimage').find('img')['src'])
-    return {'author': author, 'title': title, 'image_url': image_url}
+    image_url = urljoin(
+        'https://tululu.org/',
+        soup.find(class_='bookimage').find('img')['src']
+    )
+    comments = [
+        x.find('span', class_='black').text for x in soup.find_all('div', class_='texts')
+    ]
+    print(comments)
+    return {
+        'author': author,
+        'title': title,
+        'image_url': image_url,
+        'comments': comments
+    }
 
 
 def download_content(url, filename, folder):

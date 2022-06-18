@@ -14,12 +14,8 @@ def check_for_redirect(content):
     return
 
 
-def get_book_meta(id):
-    url = f'https://tululu.org/b{id}/'
-    response = requests.get(url)
-    response.raise_for_status()
-    check_for_redirect(response)
-    soup = BeautifulSoup(response.text, 'lxml')
+def parse_book_page(html_content):
+    soup = BeautifulSoup(html_content.text, 'lxml')
     title = sanitize_filename(soup.find('h1').text.split('::')[0].strip())
     author = sanitize_filename(soup.find('h1').find('a').text)
     image_url = urljoin(
@@ -51,16 +47,21 @@ def download_content(url, filename, folder):
 def main():
     Path('books/').mkdir(parents=True, exist_ok=True)
     for book in range(1, 11):
-        url = f'https://tululu.org/txt.php?id={book}'
-        response = requests.get(url)
+        
+        txt_url = f'https://tululu.org/txt.php?id={book}'
+        txt_response = requests.get(txt_url)
         try:
-            check_for_redirect(response)
+            check_for_redirect(txt_response)
         except requests.HTTPError:
             continue
-        book_meta = get_book_meta(book)
+        
+        book_page_url = f'https://tululu.org/b{book}/'
+        book_page_response = requests.get(book_page_url)
+        book_page_response.raise_for_status()
+        book_meta = parse_book_page(book_page_response)
         filename = f"{book}. {sanitize_filename(book_meta['title'])}.txt"
         with open(os.path.join('books/', filename), 'wb') as file:
-            file.write(response.content)
+            file.write(txt_response.content)
         image_name = urlparse(book_meta['image_url']).path.split('/')[-1]
         if image_name != 'nopic.gif':
             download_content(book_meta['image_url'], image_name, 'images/')

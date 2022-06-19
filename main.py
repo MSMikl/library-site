@@ -64,9 +64,10 @@ def main():
     )
     args = parser.parse_args()
     Path('books/').mkdir(parents=True, exist_ok=True)
+    txt_url = 'https://tululu.org/txt.php'
     for book in range(args.start_id, args.end_id):
-        txt_url = f'https://tululu.org/txt.php?id={book}'
-        txt_response = requests.get(txt_url)
+        params = {'id': book}
+        txt_response = requests.get(txt_url, params=params)
         try:
             check_for_redirect(txt_response)
         except requests.HTTPError:

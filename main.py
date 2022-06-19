@@ -19,7 +19,6 @@ logger = logging.getLogger('log_file')
 def check_for_redirect(content):
     if content.history:
         raise requests.HTTPError
-    return
 
 
 def parse_book_page(html_content):

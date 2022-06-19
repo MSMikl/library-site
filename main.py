@@ -43,8 +43,8 @@ def parse_book_page(html_content):
     }
 
 
-def download_content(url, filename, folder):
-    response = requests.get(url)
+def download_content(url, filename, folder,  params=None):
+    response = requests.get(url=url, params=params)
     response.raise_for_status()
     check_for_redirect(response)
     Path(folder).mkdir(parents=True, exist_ok=True)
@@ -83,32 +83,8 @@ def main():
     txt_url = 'https://tululu.org/txt.php'
 
     for book_id in range(args.start_id, args.end_id):
-        params = {'id': book_id}
-        while True:
-            try:
-                txt_response = requests.get(txt_url, params=params)
-                txt_response.raise_for_status()
-                check_for_redirect(txt_response)
-            except requests.HTTPError as err:
-                logger.exception(err, exc_info=True)
-                print(f'Книги {book_id} не существует', file=sys.stderr)
-                skip_book = True
-                break
-            except requests.ConnectionError as err:
-                logger.exception(err, exc_info=True)
-                print(
-                    'Ошибка соединения, повторная попытка через 10 секунд',
-                    file=sys.stderr
-                )
-                sleep(10)
-                continue
-            skip_book = False
-            break
-        if skip_book:
-            continue
-
+        
         book_page_url = f'https://tululu.org/b{book_id}/'
-
         while True:
             try:
                 book_page_response = requests.get(book_page_url)
@@ -134,26 +110,31 @@ def main():
             break
         if skip_book:
             continue
-
         book_meta = parse_book_page(book_page_response)
-        filename = f"{book_id}. {sanitize_filename(book_meta['title'])}.txt"
+        
+        params = {'id': book_id}
+        filename = f"{book_id}. {sanitize_filename(book_meta['title'])}.txt"        
         while True:
             try:
-                download_content(txt_response.url, filename, 'books/')
+                download_content(txt_url, filename, 'books/', params=params)
             except requests.HTTPError as err:
                 logger.exception(err, exc_info=True)
-                print(
-                    f"Файла с книгой {book_id} не существует",
-                    file=sys.stderr
-                )
+                print(f'Книги {book_id} не существует', file=sys.stderr)
+                skip_book = True
+                break
             except requests.ConnectionError as err:
                 logger.exception(err, exc_info=True)
                 print(
                     'Ошибка соединения, повторная попытка через 10 секунд',
                     file=sys.stderr
                 )
+                sleep(10)
                 continue
-            break  
+            skip_book = False
+            break
+        if skip_book:
+            continue
+
         image_name = book_meta['image_url'].split('/')[-1]
         image_url = urljoin(book_page_url, book_meta['image_url'])
         if image_name != 'nopic.gif':

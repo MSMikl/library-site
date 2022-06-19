@@ -32,7 +32,9 @@ def parse_book_page(html_content):
             soup.find_all('div', class_='texts')
         )
     ]
-    genres = [link.text for link in soup.find('span', class_='d_book').find_all('a')]
+    genres = [
+        link.text for link in soup.find('span', class_='d_book').find_all('a')
+        ]
     return {
         'author': author,
         'title': title,

@@ -47,6 +47,7 @@ def parse_book_page(html_content):
 def download_content(url, filename, folder):
     response = requests.get(url)
     response.raise_for_status()
+    check_for_redirect(response)
     Path(folder).mkdir(parents=True, exist_ok=True)
     with open(os.path.join(folder, filename), 'wb') as file:
         file.write(response.content)

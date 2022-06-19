@@ -83,8 +83,8 @@ def main():
 
     txt_url = 'https://tululu.org/txt.php'
 
-    for book in range(args.start_id, args.end_id):
-        params = {'id': book}
+    for book_id in range(args.start_id, args.end_id):
+        params = {'id': book_id}
         while True:
             try:
                 txt_response = requests.get(txt_url, params=params)
@@ -92,7 +92,7 @@ def main():
                 check_for_redirect(txt_response)
             except requests.HTTPError as err:
                 logger.exception(err, exc_info=True)
-                print(f'Книги {book} не существует', file=sys.stderr)
+                print(f'Книги {book_id} не существует', file=sys.stderr)
                 skip_book = True
                 break
             except requests.ConnectionError as err:
@@ -108,7 +108,7 @@ def main():
         if skip_book:
             continue
 
-        book_page_url = f'https://tululu.org/b{book}/'
+        book_page_url = f'https://tululu.org/b{book_id}/'
 
         while True:
             try:
@@ -121,7 +121,6 @@ def main():
                     f'Страницы {book_page_url} не существует',
                     file=sys.stderr
                 )
-                book += 1
                 skip_book = True
                 break
             except requests.ConnectionError as err:
@@ -138,10 +137,9 @@ def main():
             continue
 
         book_meta = parse_book_page(book_page_response)
-        filename = f"{book}. {sanitize_filename(book_meta['title'])}.txt"
+        filename = f"{book_id}. {sanitize_filename(book_meta['title'])}.txt"
         with open(os.path.join('books/', filename), 'wb') as file:
             file.write(txt_response.content)
-        book += 1
         image_name = book_meta['image_url'].split('/')[-1]
         image_url = urljoin(book_page_url, book_meta['image_url'])
         if image_name != 'nopic.gif':

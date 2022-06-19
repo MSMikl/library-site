@@ -137,8 +137,23 @@ def main():
 
         book_meta = parse_book_page(book_page_response)
         filename = f"{book_id}. {sanitize_filename(book_meta['title'])}.txt"
-        with open(os.path.join('books/', filename), 'wb') as file:
-            file.write(txt_response.content)
+        while True:
+            try:
+                download_content(txt_response.url, filename, 'books/')
+            except requests.HTTPError as err:
+                logger.exception(err, exc_info=True)
+                print(
+                    f"Файла с книгой {book_id} не существует",
+                    file=sys.stderr
+                )
+            except requests.ConnectionError as err:
+                logger.exception(err, exc_info=True)
+                print(
+                    'Ошибка соединения, повторная попытка через 10 секунд',
+                    file=sys.stderr
+                )
+                continue
+            break  
         image_name = book_meta['image_url'].split('/')[-1]
         image_url = urljoin(book_page_url, book_meta['image_url'])
         if image_name != 'nopic.gif':

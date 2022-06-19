@@ -1,6 +1,9 @@
 import argparse
 import os
+import sys
+
 from pathlib import Path
+from time import sleep
 from urllib.parse import urljoin, urlparse
 
 import requests
@@ -64,29 +67,76 @@ def main():
     )
     args = parser.parse_args()
     Path('books/').mkdir(parents=True, exist_ok=True)
+
     txt_url = 'https://tululu.org/txt.php'
+
     for book in range(args.start_id, args.end_id):
         params = {'id': book}
-        txt_response = requests.get(txt_url, params=params)
-        try:
-            check_for_redirect(txt_response)
-        except requests.HTTPError:
+        while True:
+            try:
+                txt_response = requests.get(txt_url, params=params)
+                txt_response.raise_for_status()
+                check_for_redirect(txt_response)
+            except requests.HTTPError:
+                print(f'Книги {book} не существует', file=sys.stderr)
+                skip_book = True
+                break
+            except requests.ConnectionError:
+                print(
+                    'Ошибка соединения, повторная попытка через 10 секунд',
+                    file=sys.stderr
+                )
+                sleep(10)
+                continue
+            skip_book = False
+            break
+        if skip_book:
             continue
 
         book_page_url = f'https://tululu.org/b{book}/'
-        book_page_response = requests.get(book_page_url)
-        book_page_response.raise_for_status()
-        try:
-            check_for_redirect(book_page_response)
-        except requests.HTTPError:
+
+        while True:
+            try:
+                book_page_response = requests.get(book_page_url)
+                book_page_response.raise_for_status()
+                check_for_redirect(book_page_response)
+            except requests.HTTPError:
+                print(
+                    f'Страницы {book_page_url} не существует',
+                    file=sys.stderr
+                )
+                book += 1
+                skip_book = True
+                break
+            except requests.ConnectionError:
+                print(
+                    'Ошибка соединения, повторная попытка через 10 секунд',
+                    file=sys.stderr
+                )
+                sleep(10)
+                continue
+            skip_book = False
+            break
+        if skip_book:
             continue
+
         book_meta = parse_book_page(book_page_response)
         filename = f"{book}. {sanitize_filename(book_meta['title'])}.txt"
         with open(os.path.join('books/', filename), 'wb') as file:
             file.write(txt_response.content)
+        book += 1
         image_name = urlparse(book_meta['image_url']).path.split('/')[-1]
         if image_name != 'nopic.gif':
-            download_content(book_meta['image_url'], image_name, 'images/')
+            try:
+                download_content(book_meta['image_url'], image_name, 'images/')
+            except requests.HTTPError:
+                print(
+                    f"Картинки {book_meta['image_url']} не существует",
+                    file=sys.stderr
+                )
+                continue
+            except requests.ConnectionError:
+                continue
 
 
 if __name__ == '__main__':

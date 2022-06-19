@@ -28,11 +28,11 @@ def parse_book_page(html_content):
     author = sanitize_filename(soup.find('h1').find('a').text)
     image_url = soup.find(class_='bookimage').find('img')['src']
     comments = [
-        x.find('span', class_='black').text for x in (
+        texts_class.find('span', class_='black').text for texts_class in (
             soup.find_all('div', class_='texts')
         )
     ]
-    genres = [x.text for x in soup.find('span', class_='d_book').find_all('a')]
+    genres = [link.text for link in soup.find('span', class_='d_book').find_all('a')]
     return {
         'author': author,
         'title': title,

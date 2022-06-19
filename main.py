@@ -1,7 +1,9 @@
 import argparse
+import logging
 import os
 import sys
 
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from time import sleep
 from urllib.parse import urljoin, urlparse
@@ -11,6 +13,7 @@ import requests
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
+logger = logging.getLogger('log_file')
 
 def check_for_redirect(content):
     if content.history:
@@ -50,6 +53,15 @@ def download_content(url, filename, folder):
 
 
 def main():
+    log_handler = RotatingFileHandler(
+        'app.log',
+        maxBytes=30000,
+        backupCount=2
+    )
+    log_handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s'))
+    logger.addHandler(log_handler)
+    logger.setLevel(logging.INFO)
+    
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-s',
@@ -77,11 +89,13 @@ def main():
                 txt_response = requests.get(txt_url, params=params)
                 txt_response.raise_for_status()
                 check_for_redirect(txt_response)
-            except requests.HTTPError:
+            except requests.HTTPError as err:
+                logger.exception(err, exc_info=True)
                 print(f'Книги {book} не существует', file=sys.stderr)
                 skip_book = True
                 break
-            except requests.ConnectionError:
+            except requests.ConnectionError as err:
+                logger.exception(err, exc_info=True)
                 print(
                     'Ошибка соединения, повторная попытка через 10 секунд',
                     file=sys.stderr
@@ -100,7 +114,8 @@ def main():
                 book_page_response = requests.get(book_page_url)
                 book_page_response.raise_for_status()
                 check_for_redirect(book_page_response)
-            except requests.HTTPError:
+            except requests.HTTPError as err:
+                logger.exception(err, exc_info=True)
                 print(
                     f'Страницы {book_page_url} не существует',
                     file=sys.stderr
@@ -108,7 +123,8 @@ def main():
                 book += 1
                 skip_book = True
                 break
-            except requests.ConnectionError:
+            except requests.ConnectionError as err:
+                logger.exception(err, exc_info=True)
                 print(
                     'Ошибка соединения, повторная попытка через 10 секунд',
                     file=sys.stderr
@@ -129,13 +145,15 @@ def main():
         if image_name != 'nopic.gif':
             try:
                 download_content(book_meta['image_url'], image_name, 'images/')
-            except requests.HTTPError:
+            except requests.HTTPError as err:
+                logger.exception(err, exc_info=True)
                 print(
                     f"Картинки {book_meta['image_url']} не существует",
                     file=sys.stderr
                 )
                 continue
-            except requests.ConnectionError:
+            except requests.ConnectionError as err:
+                logger.exception(err, exc_info=True)
                 continue
 
 

@@ -6,7 +6,7 @@ import sys
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from time import sleep
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin
 
 import requests
 
@@ -14,6 +14,7 @@ from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
 logger = logging.getLogger('log_file')
+
 
 def check_for_redirect(content):
     if content.history:
@@ -25,10 +26,7 @@ def parse_book_page(html_content):
     soup = BeautifulSoup(html_content.text, 'lxml')
     title = sanitize_filename(soup.find('h1').text.split('::')[0].strip())
     author = sanitize_filename(soup.find('h1').find('a').text)
-    image_url = urljoin(
-        'https://tululu.org/',
-        soup.find(class_='bookimage').find('img')['src']
-    )
+    image_url = soup.find(class_='bookimage').find('img')['src']
     comments = [
         x.find('span', class_='black').text for x in (
             soup.find_all('div', class_='texts')
@@ -62,7 +60,7 @@ def main():
     log_handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s'))
     logger.addHandler(log_handler)
     logger.setLevel(logging.INFO)
-    
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-s',
@@ -142,14 +140,15 @@ def main():
         with open(os.path.join('books/', filename), 'wb') as file:
             file.write(txt_response.content)
         book += 1
-        image_name = urlparse(book_meta['image_url']).path.split('/')[-1]
+        image_name = book_meta['image_url'].split('/')[-1]
+        image_url = urljoin(book_page_url, book_meta['image_url'])
         if image_name != 'nopic.gif':
             try:
-                download_content(book_meta['image_url'], image_name, 'images/')
+                download_content(image_url, image_name, 'images/')
             except requests.HTTPError as err:
                 logger.exception(err, exc_info=True)
                 print(
-                    f"Картинки {book_meta['image_url']} не существует",
+                    f"Картинки {image_url} не существует",
                     file=sys.stderr
                 )
                 continue

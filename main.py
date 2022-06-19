@@ -65,7 +65,6 @@ def main():
     args = parser.parse_args()
     Path('books/').mkdir(parents=True, exist_ok=True)
     for book in range(args.start_id, args.end_id):
-
         txt_url = f'https://tululu.org/txt.php?id={book}'
         txt_response = requests.get(txt_url)
         try:
@@ -76,6 +75,10 @@ def main():
         book_page_url = f'https://tululu.org/b{book}/'
         book_page_response = requests.get(book_page_url)
         book_page_response.raise_for_status()
+        try:
+            check_for_redirect(book_page_response)
+        except requests.HTTPError:
+            continue
         book_meta = parse_book_page(book_page_response)
         filename = f"{book}. {sanitize_filename(book_meta['title'])}.txt"
         with open(os.path.join('books/', filename), 'wb') as file:

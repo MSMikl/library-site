@@ -34,12 +34,14 @@ def parse_book_page(html_content):
     genres = [
         link.text for link in soup.find('span', class_='d_book').find_all('a')
         ]
+    txt_url = soup.find('a', text='скачать txt')
     return {
         'author': author,
         'title': title,
-        'image_url': image_url,
+        'image_url': image_url if image_url != '/images/nopic.gif' else None,
         'comments': comments,
-        'genres': genres
+        'genres': genres,
+        'txt_url': txt_url['href'] if txt_url else None
     }
 
 
@@ -111,9 +113,9 @@ def main():
         if skip_book:
             continue
         book_meta = parse_book_page(book_page_response)
-        
+
         params = {'id': book_id}
-        filename = f"{book_id}. {sanitize_filename(book_meta['title'])}.txt"        
+        filename = f"{book_id}. {(book_meta['title'])}.txt"
         while True:
             try:
                 download_content(txt_url, filename, 'books/', params=params)
@@ -135,21 +137,22 @@ def main():
         if skip_book:
             continue
 
+        if not book_meta.get('image_url'):
+            continue
         image_name = book_meta['image_url'].split('/')[-1]
         image_url = urljoin(book_page_url, book_meta['image_url'])
-        if image_name != 'nopic.gif':
-            try:
-                download_content(image_url, image_name, 'images/')
-            except requests.HTTPError as err:
-                logger.exception(err, exc_info=True)
-                print(
-                    f"Картинки {image_url} не существует",
-                    file=sys.stderr
-                )
-                continue
-            except requests.ConnectionError as err:
-                logger.exception(err, exc_info=True)
-                continue
+        try:
+            download_content(image_url, image_name, 'images/')
+        except requests.HTTPError as err:
+            logger.exception(err, exc_info=True)
+            print(
+                f"Картинки {image_url} не существует",
+                file=sys.stderr
+            )
+            continue
+        except requests.ConnectionError as err:
+            logger.exception(err, exc_info=True)
+            continue
 
 
 if __name__ == '__main__':

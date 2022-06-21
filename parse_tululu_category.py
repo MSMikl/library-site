@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import sys
@@ -13,13 +14,34 @@ from main import parse_book_page, download_content, check_for_redirect
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-s',
+        '--start_page',
+        type=int,
+        help='Номер первой страницы для скачивания',
+        default=1
+    )
+    parser.add_argument(
+        '-e',
+        '--end_page',
+        type=int,
+        help='Номер последней страницы для скаичвания',
+        default=1
+    )
+    args = parser.parse_args()
+    
     books_data = []
     book_urls = []
     category_index = 55
-    for page_number in range(1, 5):
+    for page_number in range(args.start_page, args.end_page + 1):
         url = f"https://tululu.org/l{category_index}/{page_number}"
         response = requests.get(url)
         response.raise_for_status()
+        try:
+            check_for_redirect(response)
+        except requests.HTTPError:
+            break
         soup = BeautifulSoup(response.text, 'lxml')
         book_url_selector = "#content table.d_book a[href^='/b']"
         book_urls += [

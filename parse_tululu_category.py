@@ -2,7 +2,6 @@ import json
 import os
 import sys
 from time import sleep
-from urllib.error import HTTPError
 
 from urllib.parse import urljoin
 
@@ -12,22 +11,24 @@ from bs4 import BeautifulSoup
 
 from main import parse_book_page, download_content, check_for_redirect
 
+
 def main():
     books_data = []
     book_urls = []
     category_index = 55
-    for page_number in range(1, 2):
+    for page_number in range(1, 5):
         url = f"https://tululu.org/l{category_index}/{page_number}"
         response = requests.get(url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'lxml')
+        book_url_selector = "#content table.d_book a[href^='/b']"
         book_urls += [
-            urljoin(url, link.find('a')['href']) for link in (
-                soup
-                .find('div', id='content')
-                .find_all('table', class_='d_book')
-                )
+            urljoin(
+                url,
+                link['href']
+                ) for link in soup.select(book_url_selector)
         ]
+    print(f'Собрано {len(book_urls)} книг. Начинаю скачивание')
     for book_url in book_urls:
         skip_book = False
         while True:
@@ -42,7 +43,7 @@ def main():
                 break
             except requests.ConnectionError:
                 print(
-                    f'Ошибка соединения. Повторное подключение через 10 секунд',
+                    'Ошибка соединения. Повторное подключение через 10с',
                     file=sys.stderr
                 )
                 sleep(10)
@@ -89,7 +90,7 @@ def main():
                     break
                 except requests.ConnectionError:
                     print(
-                        "Ошибка соединения, повторное подключение через 10 секунд",
+                        "Ошибка соединения, повторное подключение через 10с",
                         file=sys.stderr()
                     )
                     sleep(10)
@@ -99,8 +100,7 @@ def main():
         del book_meta['image_url']
         del book_meta['txt_url']
         books_data.append(book_meta)
-    
-    print(books_data)
+
     with open('books.json', 'w', encoding='UTF-8') as file:
         json.dump(books_data, file, ensure_ascii=False, indent=4)
 

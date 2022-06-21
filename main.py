@@ -23,18 +23,18 @@ def check_for_redirect(content):
 
 def parse_book_page(html_content):
     soup = BeautifulSoup(html_content.text, 'lxml')
-    title = sanitize_filename(soup.find('h1').text.split('::')[0].strip())
-    author = sanitize_filename(soup.find('h1').find('a').text)
-    image_url = soup.find(class_='bookimage').find('img')['src']
+    title = sanitize_filename(soup.select_one("h1").text.split('::')[0].strip())
+    author = sanitize_filename(soup.select_one("h1 a").text)
+    image_url = soup.select_one(".bookimage img")['src']
     comments = [
-        texts_class.find('span', class_='black').text for texts_class in (
-            soup.find_all('div', class_='texts')
+        texts_class.text for texts_class in (
+            soup.select(".texts .black")
         )
     ]
     genres = [
-        link.text for link in soup.find('span', class_='d_book').find_all('a')
+        link.text for link in soup.select(".d_book a[href^='/l']")
         ]
-    txt_url = soup.find('a', text='скачать txt')
+    txt_url = soup.select_one(".d_book a[href^='/txt']")
     return {
         'author': author,
         'title': title,
@@ -85,7 +85,6 @@ def main():
     txt_url = 'https://tululu.org/txt.php'
 
     for book_id in range(args.start_id, args.end_id):
-        
         book_page_url = f'https://tululu.org/b{book_id}/'
         while True:
             try:

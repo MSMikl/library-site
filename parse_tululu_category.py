@@ -27,7 +27,7 @@ def main():
         '-e',
         '--end_page',
         type=int,
-        help='Номер последней страницы для скаичвания',
+        help='Номер последней страницы для скачивания',
         default=1
     )
     parser.add_argument(

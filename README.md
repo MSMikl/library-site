@@ -34,9 +34,9 @@
 
 Параметры запуска
 
-        -s START_PAGE, --start_page START_PAGE  Номер первой страницы списка книг в жанре для скачивания (по умолчанию 1)
-        -e END_PAGE, --end_page END_PAGE        Номер последней страницы для скачивания (по умолчанию 1)
+        -s START_PAGE, --start_page START_PAGE          Номер первой страницы списка книг в жанре для скачивания (по умолчанию 1)
+        -e END_PAGE, --end_page END_PAGE                Номер последней страницы для скачивания (по умолчанию 1)
         -d DEST_FOLDER, --dest_folder DEST_FOLDER       Папка для скачивания (По умолчанию - папка с программой)
-        -si, --skip_imgs        Не скачивать обложки
-        -st, --skip_txt         Не скачивать txt
-        -j JSON_PATH, --json_path JSON_PATH     Путь к json-файлу с информацией (по умолчанию - books.json в папке с программой)
+        -si, --skip_imgs                                Не скачивать обложки
+        -st, --skip_txt                                 Не скачивать txt
+        -j JSON_PATH, --json_path JSON_PATH             Путь к json-файлу с информацией (по умолчанию - books.json в папке с программой)

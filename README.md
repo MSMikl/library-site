@@ -30,7 +30,7 @@
 
 Запустите скрипт командой
 
-        parse_tululu_category.py [-h] [-s START_PAGE] [-e END_PAGE] [-d DEST_FOLDER] [-si] [-st] [-j JSON_PATH]
+        python parse_tululu_category.py [-h] [-s START_PAGE] [-e END_PAGE] [-d DEST_FOLDER] [-si] [-st] [-j JSON_PATH]
 
 Параметры запуска
 

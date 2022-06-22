@@ -127,8 +127,7 @@ def main():
                 )
                 sleep(10)
                 break
-            if not book_meta.get('txt_url'):
-                skip_book = True
+            skip_book = not book_meta.get('txt_url')
             break
         if skip_book:
             continue

@@ -54,7 +54,7 @@ def parse_start_args():
         '-j',
         '--json_path',
         default='./books.json',
-        help='Путь к json-файлу с информацией'   
+        help='Путь к json-файлу с информацией'
     )
     args = parser.parse_args()
     return args
@@ -70,8 +70,8 @@ def main():
     books_info = []
     book_urls = []
     category_index = 55
-    
-    ### Парсинг ссылок на книги со страниц каталога 
+
+    # Парсинг ссылок на книги со страниц каталога 
     for page_number in range(args.start_page, args.end_page + 1):
         url = f"https://tululu.org/l{category_index}/{page_number}"
         finish_parsing = False
@@ -100,17 +100,15 @@ def main():
         soup = BeautifulSoup(response.text, 'lxml')
         book_url_selector = "#content table.d_book a[href^='/b']"
         book_urls += [
-            urljoin(
-                url,
-                link['href']
-                ) for link in soup.select(book_url_selector)
+            urljoin(url, link['href'])
+            for link in soup.select(book_url_selector)
         ]
     print(f'Собрано {len(book_urls)} книг. Начинаю скачивание')
-    
-    ### Скаичвание книг по полученным ссылкам 
+
+    # Скачивание книг по полученным ссылкам
     for book_url in book_urls:
-        
-        ### Парсинг метаданных о книге с ее страницы
+
+        # Парсинг метаданных о книге с ее страницы
         skip_book = False
         while True:
             try:
@@ -134,8 +132,8 @@ def main():
             break
         if skip_book:
             continue
-        
-        ### Скачивание txt-файла книги
+
+        # Скачивание txt-файла книги
         txt_url = urljoin(book_url, book_meta['txt_url'])
         book_filename = f"{(book_meta['title'])}.txt"
         while not args.skip_txt:
@@ -161,7 +159,7 @@ def main():
         if not args.skip_txt:
             book_meta['book_path'] = os.path.join('books/', book_filename)
 
-        ### Скачивание изображения книги
+        # Скачивание изображения книги
         if book_meta.get('image_url') and not args.skip_imgs:
             image_url = urljoin(book_url, book_meta['image_url'])
             image_name = book_meta['image_url'].split('/')[-1]
@@ -187,7 +185,7 @@ def main():
         del book_meta['txt_url']
         books_info.append(book_meta)
 
-    ### Запись информации о книгах в файл
+    # Запись информации о книгах в файл
     with open(os.path.join('.', args.json_path), 'w', encoding='UTF-8') as file:
         json.dump(books_info, file, ensure_ascii=False, indent=4)
 

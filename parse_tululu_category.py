@@ -67,7 +67,7 @@ def main():
         exist_ok=True
     )
     os.chdir(os.path.join('.', args.dest_folder))
-    books_data = []
+    books_info = []
     book_urls = []
     category_index = 55
     for page_number in range(args.start_page, args.end_page + 1):
@@ -159,10 +159,10 @@ def main():
             book_meta['img_src'] = os.path.join('images/', image_name)
         del book_meta['image_url']
         del book_meta['txt_url']
-        books_data.append(book_meta)
+        books_info.append(book_meta)
 
     with open(os.path.join('.', args.json_path), 'w', encoding='UTF-8') as file:
-        json.dump(books_data, file, ensure_ascii=False, indent=4)
+        json.dump(books_info, file, ensure_ascii=False, indent=4)
 
 
 if __name__ == '__main__':

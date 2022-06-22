@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 from main import parse_book_page, download_content, check_for_redirect
 
 
-def main():
+def parse_start_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-s',
@@ -56,11 +56,14 @@ def main():
         '--json_path',
         type=str,
         default='./books.json',
-        help='Путь к json-файлу с информацией'
-        
+        help='Путь к json-файлу с информацией'   
     )
     args = parser.parse_args()
+    return args
 
+
+def main():
+    args = parse_start_args()
     Path(os.path.join('.', args.dest_folder)).mkdir(
         parents=True,
         exist_ok=True
@@ -134,7 +137,7 @@ def main():
             continue
         if not args.skip_txt:
             book_meta['book_path'] = os.path.join('books/', book_filename)
-        
+
         if book_meta.get('image_url') and not args.skip_imgs:
             image_url = urljoin(book_url, book_meta['image_url'])
             image_name = book_meta['image_url'].split('/')[-1]

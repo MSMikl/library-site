@@ -33,7 +33,6 @@ def parse_start_args():
     parser.add_argument(
         '-d',
         '--dest_folder',
-        type=str,
         help='Папка для скачивания',
         default='./'
     )
@@ -54,7 +53,6 @@ def parse_start_args():
     parser.add_argument(
         '-j',
         '--json_path',
-        type=str,
         default='./books.json',
         help='Путь к json-файлу с информацией'   
     )

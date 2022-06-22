@@ -82,6 +82,10 @@ def main():
                 check_for_redirect(response)
             except requests.HTTPError:
                 finish_parsing = True
+                print(
+                    f"Вышли за пределы каталога (стр.{page_number})",
+                    file=sys.stderr
+                )
                 break
             except requests.ConnectionError:
                 sleep(10)

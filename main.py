@@ -27,9 +27,8 @@ def parse_book_page(html_content):
     author = sanitize_filename(soup.select_one("h1 a").text)
     image_url = soup.select_one(".bookimage img")['src']
     comments = [
-        texts_class.text for texts_class in (
-            soup.select(".texts .black")
-        )
+        texts_class.text
+        for texts_class in soup.select(".texts .black")
     ]
     genres = [
         link.text for link in soup.select(".d_book a[href^='/l']")

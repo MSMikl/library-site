@@ -98,7 +98,7 @@ def main():
         if finish_parsing:
             break
         soup = BeautifulSoup(response.text, 'lxml')
-        book_url_selector = "#content table.d_book a[href^='/b']"
+        book_url_selector = "#content table.d_book a[href^='/b'][title^='Бесплатная библиотека']"
         book_urls += [
             urljoin(url, link['href'])
             for link in soup.select(book_url_selector)

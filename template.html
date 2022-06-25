@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
   <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -15,7 +15,11 @@
       <div class="card mb-3" style="max-width: 540px;">
         <div class="row no-gutters">
             <div class="col-md-4">
-              <img src= "{{ book.img_src }}" class="card-img" alt="{{ book.title }}">
+              {% if book.img_src %}
+                <img src= "{{ book.img_src }}" class="card-img" alt="{{ book.title }}">
+              {% else %}
+                <img src= "images/nopic.gif" class="card-img" alt="{{ book.title }}">
+              {% endif %}
             </div>
             <div class="col-md-8">
               <div class="card-body">

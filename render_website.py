@@ -14,7 +14,6 @@ def main():
 
     with open ('books.json', 'r', encoding='UTF-8') as file:
         books = json.load(file)
-    print(books)
 
     template = env.get_template('template.html')
 

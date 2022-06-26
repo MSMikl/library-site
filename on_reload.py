@@ -15,7 +15,6 @@ def main():
         books = json.load(file)
 
     chunked_books = list(chunked(books, 2))
-    print(len(chunked_books[0]))
 
     template = env.get_template('template.html')
 

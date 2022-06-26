@@ -71,7 +71,7 @@ def main():
     book_urls = []
     category_index = 55
 
-    # Парсинг ссылок на книги со страниц каталога 
+    # Парсинг ссылок на книги со страниц каталога
     for page_number in range(args.start_page, args.end_page + 1):
         url = f"https://tululu.org/l{category_index}/{page_number}"
         finish_parsing = False
@@ -134,7 +134,7 @@ def main():
 
         # Скачивание txt-файла книги
         txt_url = urljoin(book_url, book_meta['txt_url'])
-        book_filename = f"{(book_meta['title'])}.txt"
+        book_filename = f"{(book_meta['title'])}.txt".replace(' ', '_')
         while not args.skip_txt:
             try:
                 download_content(txt_url, book_filename, 'books/')

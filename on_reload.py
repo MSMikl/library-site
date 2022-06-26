@@ -1,4 +1,5 @@
 import json
+import sys
 
 from more_itertools import chunked
 
@@ -6,6 +7,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 
 def main():
+    print(sys.executable)
     env = Environment(
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])

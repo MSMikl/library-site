@@ -1,10 +1,14 @@
+import os
+import sys
+
 from livereload import Server, shell
 
 
 def main():
-
+    exec_path = sys.executable.replace(os.sep, '/')
+    print(exec_path)
     server = Server()
-    server.watch('template.html', shell('./venv/Scripts/python.exe on_reload.py'))
+    server.watch('template.html', shell(f'{exec_path} on_reload.py'))
     server.serve(root='.')
 
 

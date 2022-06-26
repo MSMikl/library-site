@@ -155,3 +155,5 @@ cython_debug/
 /images
 books.json
 index.html
+/pages
+\pages

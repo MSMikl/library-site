@@ -17,15 +17,18 @@ def main():
         books = json.load(file)
     os.makedirs('./pages', exist_ok=True)
     paged_books = list(chunked(books, page_size))
-    for number, page in enumerate(paged_books):
+    total_pages = len(paged_books)
+    for page_number, page in enumerate(paged_books):
         chunked_books = list(chunked(page, 2))
         template = env.get_template('template.html')
         rendered_page = template.render(
-            books=chunked_books
+            books=chunked_books,
+            total_pages=total_pages + 1,
+            current_page=page_number + 1
         )
         with open(os.path.join(
             'pages',
-            f"index{number}.html"
+            f"index{page_number + 1}.html"
         ), 'w', encoding="utf8") as file:
             file.write(rendered_page)
 

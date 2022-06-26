@@ -15,20 +15,28 @@
       <ul class="pagination">
         {% if current_page == 1 %}
           <li class="page-item disabled">
-            <a class="page-link" href="#" aria-disabled="true">Previous</a>
+            <a class="page-link" href="#" aria-disabled="true">Назад</a>
           </li>
         {% else %}
-          <li class="page-item"><a class="page-link" href="index{{current_page - 1}}.html">Previous</a></li>
+          <li class="page-item"><a class="page-link" href="index{{current_page - 1}}.html">Назад</a></li>
         {% endif %}
         {% for any_page in range(1, total_pages) %}
-          <li class="page-item"><a class="page-link" href="index{{any_page}}.html">{{any_page}}</a></li>
+          {% if any_page == current_page %}
+            <li class="page-item active" aria-current="page">
+              <span class="page-link">{{any_page}}
+                <span class="sr-only">(current)</span>
+              </span>
+            </li>
+          {% else %}
+            <li class="page-item"><a class="page-link" href="index{{any_page}}.html">{{any_page}}</a></li>
+          {% endif %}
         {% endfor %}
         {% if current_page == total_pages- 1 %}
           <li class="page-item disabled">
-            <a class="page-link" href="#" aria-disabled="true">Next</a>
+            <a class="page-link" href="#" aria-disabled="true">Вперед</a>
           </li>
         {% else %}
-          <li class="page-item"><a class="page-link" href="index{{current_page + 1}}.html">Next</a></li>
+          <li class="page-item"><a class="page-link" href="index{{current_page + 1}}.html">Вперед</a></li>
         {% endif %}
       </ul>
     </nav>

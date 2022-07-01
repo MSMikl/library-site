@@ -51,7 +51,7 @@
                 <div class="row no-gutters">
                   <div class="col-md-4">
                     {% if book.img_src %}
-                      <img src= "../{{ book.img_src }}" class="card-img" alt="{{ book.title }}">
+                      <img src= "../{{ book.img_src|urlencode }}" class="card-img" alt="{{ book.title }}">
                     {% else %}
                       <img src= "../images/nopic.gif" class="card-img" alt="{{ book.title }}">
                     {% endif %}
@@ -68,7 +68,7 @@
                         {% endfor %}
                       </div>
                       <p class="card-text">
-                        <a href="../{{ book.book_path }}" target="_blank">Читать</a>
+                        <a href="../{{ book.book_path|urlencode }}" target="_blank">Читать</a>
                       </p>
                     </div>
                   </div>

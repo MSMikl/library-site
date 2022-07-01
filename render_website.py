@@ -37,7 +37,7 @@ def rebuild_pages():
 def main():
     rebuild_pages()
     server = Server()
-    server.watch('template.html', rebuild_pages())
+    server.watch('template.html', rebuild_pages)
     server.serve(root='.')
 
 

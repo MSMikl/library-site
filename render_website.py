@@ -35,8 +35,7 @@ def rebuild_pages():
 
 
 def main():
-    exec_path = sys.executable.replace(os.sep, '/')
-    print(exec_path)
+    rebuild_pages()
     server = Server()
     server.watch('template.html', rebuild_pages())
     server.serve(root='.')

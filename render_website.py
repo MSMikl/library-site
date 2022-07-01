@@ -19,17 +19,17 @@ def rebuild_pages():
     os.makedirs('./pages', exist_ok=True)
     paged_books = list(chunked(books, page_size))
     total_pages = len(paged_books)
-    for page_number, page in enumerate(paged_books):
+    for page_number, page in enumerate(paged_books, start=1):
         chunked_books = list(chunked(page, 2))
         template = env.get_template('template.html')
         rendered_page = template.render(
             books=chunked_books,
             total_pages=total_pages,
-            current_page=page_number + 1
+            current_page=page_number
         )
         with open(os.path.join(
             'pages',
-            f"index{page_number + 1}.html"
+            f"index{page_number}.html"
         ), 'w', encoding="utf8") as file:
             file.write(rendered_page)
 

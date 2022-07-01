@@ -21,7 +21,7 @@
         {% else %}
           <li class="page-item"><a class="page-link" href="index{{current_page - 1}}.html">Назад</a></li>
         {% endif %}
-        {% for any_page in range(1, total_pages) %}
+        {% for any_page in range(1, total_pages + 1) %}
           {% if any_page == current_page %}
             <li class="page-item active" aria-current="page">
               <span class="page-link">{{any_page}}
@@ -32,7 +32,7 @@
             <li class="page-item"><a class="page-link" href="index{{any_page}}.html">{{any_page}}</a></li>
           {% endif %}
         {% endfor %}
-        {% if current_page == total_pages- 1 %}
+        {% if current_page == total_pages %}
           <li class="page-item disabled">
             <a class="page-link" aria-disabled="true">Вперед</a>
           </li>

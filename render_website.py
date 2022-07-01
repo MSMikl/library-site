@@ -24,7 +24,7 @@ def rebuild_pages():
         template = env.get_template('template.html')
         rendered_page = template.render(
             books=chunked_books,
-            total_pages=total_pages + 1,
+            total_pages=total_pages,
             current_page=page_number + 1
         )
         with open(os.path.join(

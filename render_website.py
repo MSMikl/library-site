@@ -1,6 +1,5 @@
 import json
 import os
-import sys
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from livereload import Server
